@@ -6,7 +6,7 @@
 /*   By: ialausud <ialausud@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 20:36:47 by ialausud          #+#    #+#             */
-/*   Updated: 2026/02/10 21:13:57 by ialausud         ###   ########.fr       */
+/*   Updated: 2026/02/10 21:19:39 by ialausud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ void    process_heredocs(t_token *list)
             }
             close(fd);
 
-            tmp->type = TOK_REDIR_IN;
+            tmp->type = TOK_REDIR_IN; // we change the type of the current node to TOK_REDIR_IN because we will treat it as a regular input redirection in the execution phase
+                                        // we set the value of the next node to the name of the temporary file
             free(tmp->next->value);
             tmp->next->value = filename;
         }
