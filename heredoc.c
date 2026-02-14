@@ -6,7 +6,7 @@
 /*   By: ialausud <ialausud@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 20:36:47 by ialausud          #+#    #+#             */
-/*   Updated: 2026/02/10 21:19:39 by ialausud         ###   ########.fr       */
+/*   Updated: 2026/02/14 19:34:05 by ialausud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static char *gen_heredoc_name(void)
     static int  idx = 0;
     char        *num;
     char        *name;
-    char        *prefix = "./shellGuys_heredoc_";
+    char        *prefix = "/tmp/shellGuys_heredoc_";
 
     num = ft_itoa(idx++);
     if (!num)
@@ -43,16 +43,19 @@ void    process_heredocs(t_token *list)
     while (tmp)
     {
         if (tmp->type == TOK_HEREDOC
-            && tmp->next && tmp->next->type == TOK_INFILE)
+            && tmp->next && tmp->next->type == TOK_LIMITER)
         {
             limiter = tmp->next->value;
             filename = gen_heredoc_name();
             if (!filename)
+            {
+                perror("heredoc filename");
                 return;
-
+            }
             fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
             if (fd == -1)
             {
+                perror("heredoc open");
                 free(filename);
                 return;
             }
@@ -70,9 +73,8 @@ void    process_heredocs(t_token *list)
                 free(line);
             }
             close(fd);
-
-            tmp->type = TOK_REDIR_IN; // we change the type of the current node to TOK_REDIR_IN because we will treat it as a regular input redirection in the execution phase
-                                        // we set the value of the next node to the name of the temporary file
+            tmp->type = TOK_REDIR_IN;
+            tmp->next->type = TOK_INFILE;
             free(tmp->next->value);
             tmp->next->value = filename;
         }
